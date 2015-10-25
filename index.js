@@ -40,13 +40,13 @@ ElasticsearchStream.prototype._write = function (entry, encoding, callback) {
   var client = this._client;
   var index = this._index;
   var type = this._type;
+  entry = JSON.parse(entry.toString('utf8'));
 
   var d = domain.create();
   d.on('error', function (err) { 
     console.log("Elasticsearch Error", err.stack);
   });
   d.run(function () {
-    entry = JSON.parse(entry.toString('utf8'));
     var env = process.env.NODE_ENV || 'development';
 
     // Reassign these fields so them match what the default Kibana dashboard 
