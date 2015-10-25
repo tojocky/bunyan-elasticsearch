@@ -54,6 +54,7 @@ ElasticsearchStream.prototype._write = function (entry, encoding, callback) {
     entry['@timestamp'] = entry.time;
     entry.level = levels[entry.level];
     entry.message = entry.msg;
+    entry.env = env;
 
     // remove duplicate fields
     delete entry.time;
