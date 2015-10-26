@@ -41,25 +41,24 @@ ElasticsearchStream.prototype._write = function (entry, encoding, callback) {
   var index = this._index;
   var type = this._type;
   entry = JSON.parse(entry.toString('utf8'));
+  var env = process.env.NODE_ENV || 'development';
+
+  // Reassign these fields so them match what the default Kibana dashboard 
+  // expects to see.
+  entry['@timestamp'] = entry.time;
+  entry.level = levels[entry.level];
+  entry.message = entry.msg;
+  entry.env = env;
+
+  // remove duplicate fields
+  delete entry.time;
+  delete entry.msg;
 
   var d = domain.create();
   d.on('error', function (err) { 
     console.log("Elasticsearch Error", err.stack);
   });
   d.run(function () {
-    var env = process.env.NODE_ENV || 'development';
-
-    // Reassign these fields so them match what the default Kibana dashboard 
-    // expects to see.
-    entry['@timestamp'] = entry.time;
-    entry.level = levels[entry.level];
-    entry.message = entry.msg;
-    entry.env = env;
-
-    // remove duplicate fields
-    delete entry.time;
-    delete entry.msg;
-
     var datestamp = moment(entry.timestamp).format('YYYY.MM.DD');
 
     var options = {
